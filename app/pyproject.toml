@@ -13,3 +13,5 @@ dependencies = [
     "litestar[standard]",
     "Pillow",
 ]
+[tool.setuptools]
+py-modules = ["main"]
