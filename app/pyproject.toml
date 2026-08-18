@@ -10,7 +10,8 @@ classifiers = [
 ]
 dependencies = [
     "requests",
-    "litestar[standard]",
+    "litestar",
+    "uvicorn",
     "Pillow",
 ]
 [tool.setuptools]
