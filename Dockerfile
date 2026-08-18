@@ -1,10 +1,31 @@
 FROM python:3.11-slim
+
+
+FROM debian:bullseye-slim
+
 RUN apt-get update && \
-    apt-get install -y --no-install-recommends build-essential && \
+    apt-get install -y --no-install-recommends \
+        build-essential \
+        ca-certificates \
+        curl \
+        gnupg \
+        python3 \
+        python3-pip && \
+    curl https://packages.cloud.google.com/apt/doc/apt-key.gpg \
+        | gpg --dearmor -o /usr/share/keyrings/coral-edgetpu.gpg && \
+    echo "deb [signed-by=/usr/share/keyrings/coral-edgetpu.gpg] https://packages.cloud.google.com/apt coral-edgetpu-stable main" \
+        > /etc/apt/sources.list.d/coral-edgetpu.list && \
+    apt-get update && \
+    apt-get install -y --no-install-recommends \
+        libedgetpu1-std \
+        python3-pycoral && \
     rm -rf /var/lib/apt/lists/*
-    
+
 COPY app /app
-RUN python -m pip install /app --extra-index-url https://www.piwheels.org/simple
+
+RUN python3 -m pip install --upgrade pip setuptools wheel && \
+    python3 -m pip install /app --extra-index-url https://www.piwheels.org/simple
+
 
 EXPOSE 8000/tcp
 
