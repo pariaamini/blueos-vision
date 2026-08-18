@@ -1,6 +1,3 @@
-FROM python:3.11-slim
-
-
 FROM debian:bullseye-slim
 
 RUN apt-get update && \
