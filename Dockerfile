@@ -26,7 +26,7 @@ RUN python3 -m pip install --upgrade pip setuptools wheel && \
 
 EXPOSE 8000/tcp
 
-LABEL version="0.0.3"
+LABEL version="0.0.4"
 
 ARG IMAGE_NAME
 
