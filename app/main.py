@@ -47,7 +47,7 @@ class CountController(Controller):
         return output
 
 
-class CoralController(Controller):
+class CoralController(Controller): 
     MODEL_PATH = Path(
         "/app/test_data/"
         "ssd_mobilenet_v2_coco_quant_postprocess_edgetpu.tflite"
@@ -58,8 +58,6 @@ class CoralController(Controller):
     @get("/test_coral", media_type=MediaType.JSON, sync_to_thread=True)
     def test_coral(self) -> dict:
         try:
-            # Lazy imports allow the web application to start even if
-            # the Coral runtime has a problem.
             from PIL import Image
             from pycoral.adapters import common, detect
             from pycoral.utils.dataset import read_label_file
