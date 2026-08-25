@@ -248,10 +248,10 @@
     }, 1000)
 
     const mavlink2restUrl =
-      `http://${document.location.hostname}/mavlink2rest`; 
+      `http://${document.location.hostname}/mavlink2rest`;
 
     const mavlinkButton =
-      document.getElementById("test-mavlink"); 
+      document.getElementById("test-mavlink");
 
     const mavlinkResult =
       document.getElementById("mavlink-result");
@@ -339,6 +339,19 @@
       }
     });
   </script>
+
+  <h3>Rover attitude</h3>
+
+  <p>
+    Roll: <span id="roll">--.-</span>°
+    Pitch: <span id="pitch">--.-</span>°
+    Yaw: <span id="yaw">--.-</span>°
+  </p>
+
+  <p>
+    Last updated:
+    <span id="last">--.-</span> seconds ago
+  </p>
 </body>
 
 </html>
