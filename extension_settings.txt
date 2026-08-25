@@ -1,0 +1,34 @@
+extension identifier:
+_.blueosvisionmain
+
+extension name:
+DeltaSea Vision
+
+docker image:
+_/blueos-vision
+
+docker tag:
+main
+
+custom settings:
+{
+  "ExposedPorts": {
+    "8000/tcp": {}
+  },
+  "HostConfig": {
+    "Privileged": true,
+    "Binds": [
+      "/dev/bus/usb:/dev/bus/usb"
+    ],
+    "ExtraHosts": [
+      "host.docker.internal:host-gateway"
+    ],
+    "PortBindings": {
+      "8000/tcp": [
+        {
+          "HostPort": ""
+        }
+      ]
+    }
+  }
+}
