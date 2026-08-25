@@ -1,26 +1,25 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-  <title>Delta Sea Vision</title>
+  <title>DeltaSea Vision</title>
 
   <style>
     :root {
+      font-family: system-ui, sans-serif;
       color-scheme: dark;
-      font-family: Inter, system-ui, sans-serif;
 
-      --background: #07151d;
-      --panel: #102630;
-      --panel-light: #173641;
-      --accent: #38d6c4;
-      --accent-dark: #1b9f95;
-      --text: #eefcfa;
-      --muted: #9bb8bc;
-      --success: #69e295;
-      --error: #ff7782;
-      --border: #27505b;
+      --background: #111827;
+      --panel: #1f2937;
+      --border: #374151;
+      --text: #f3f4f6;
+      --muted: #9ca3af;
+      --success: #4ade80;
+      --error: #f87171;
+      --accent: #38bdf8;
     }
 
     * {
@@ -28,62 +27,43 @@
     }
 
     body {
-      margin: 0;
-      min-height: 100vh;
+      max-width: 720px;
+      margin: 60px auto;
+      padding: 0 20px;
       color: var(--text);
-      background:
-        radial-gradient(circle at top right, #144b59 0, transparent 35%),
-        var(--background);
-    }
-
-    main {
-      width: min(950px, calc(100% - 32px));
-      margin: 0 auto;
-      padding: 48px 0;
-    }
-
-    header {
-      margin-bottom: 32px;
+      background: var(--background);
     }
 
     h1 {
-      margin: 0;
-      font-size: clamp(2rem, 5vw, 3.5rem);
-    }
-
-    header p {
-      margin: 8px 0 0;
-      color: var(--muted);
-      font-size: 1.05rem;
+      margin-bottom: 24px;
+      font-size: 24px;
+      font-weight: 600;
     }
 
     .status-grid {
       display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
-      gap: 16px;
-      margin-bottom: 24px;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 12px;
+      margin-bottom: 20px;
     }
 
-    .card {
-      padding: 22px;
+    .status-box,
+    .output-box {
+      padding: 16px;
       border: 1px solid var(--border);
-      border-radius: 16px;
-      background: rgba(16, 38, 48, 0.9);
-      box-shadow: 0 14px 35px rgba(0, 0, 0, 0.2);
+      border-radius: 8px;
+      background: var(--panel);
     }
 
     .label {
       margin-bottom: 8px;
       color: var(--muted);
-      font-size: 0.8rem;
-      font-weight: 700;
-      letter-spacing: 0.1em;
-      text-transform: uppercase;
+      font-size: 13px;
     }
 
     .value {
-      font-size: 1.25rem;
-      font-weight: 700;
+      font-size: 15px;
+      font-weight: 600;
     }
 
     .ready {
@@ -94,112 +74,97 @@
       color: var(--muted);
     }
 
-    button {
-      padding: 13px 20px;
-      border: 0;
-      border-radius: 10px;
-      color: #032421;
-      background: var(--accent);
-      font-size: 1rem;
-      font-weight: 800;
-      cursor: pointer;
-      transition: 150ms ease;
+    .error {
+      color: var(--error);
     }
 
-    button:hover {
-      background: #65eadb;
-      transform: translateY(-1px);
+    button {
+      margin-bottom: 20px;
+      padding: 10px 16px;
+      border: 0;
+      border-radius: 6px;
+      color: #111827;
+      background: var(--accent);
+      font-size: 14px;
+      font-weight: 600;
+      cursor: pointer;
     }
 
     button:disabled {
-      cursor: wait;
       opacity: 0.6;
-      transform: none;
+      cursor: wait;
+    }
+
+    .output-box {
+      min-height: 140px;
     }
 
     #message {
-      margin: 18px 0 0;
+      margin: 0 0 12px;
       color: var(--muted);
     }
 
-    .results {
-      display: grid;
-      gap: 12px;
-      margin-top: 20px;
+    #message.error {
+      color: var(--error);
     }
 
     .detection {
       display: flex;
-      align-items: center;
       justify-content: space-between;
-      padding: 14px 16px;
-      border-radius: 10px;
-      background: var(--panel-light);
+      padding: 8px 0;
+      border-top: 1px solid var(--border);
     }
 
     .confidence {
       color: var(--accent);
-      font-weight: 800;
     }
 
-    pre {
-      overflow-x: auto;
-      margin: 20px 0 0;
-      padding: 16px;
-      border-radius: 10px;
-      color: #bdeee8;
-      background: #061015;
-      white-space: pre-wrap;
+    #timings {
+      margin-top: 14px;
+      color: var(--muted);
+      font-size: 13px;
+      overflow-wrap: anywhere;
     }
 
-    .error {
-      color: var(--error);
+    @media (max-width: 500px) {
+      .status-grid {
+        grid-template-columns: 1fr;
+      }
     }
   </style>
 </head>
 
 <body>
   <main>
-    <header>
-      <h1>Delta Sea Vision</h1>
-      <p>BlueOS onboard object-detection service</p>
-    </header>
+    <h1>DeltaSea Vision</h1>
 
     <section class="status-grid">
-      <div class="card">
+      <div class="status-box">
         <div class="label">Extension</div>
         <div class="value ready">Running</div>
       </div>
 
-      <div class="card">
+      <div class="status-box">
         <div class="label">Coral USB</div>
-        <div id="coral-status" class="value unknown">Not tested</div>
+        <div id="coral-status" class="value unknown">Not Connected</div>
       </div>
 
-      <div class="card">
+      <div class="status-box">
         <div class="label">Camera</div>
         <div class="value unknown">Not connected</div>
       </div>
     </section>
 
-    <section class="card">
-      <div class="label">Saved-image hardware test</div>
-      <h2>SSD MobileNet V2</h2>
+    <button id="run-test" type="button">Run Test</button>
 
-      <p>
-        Run five inferences against the bundled Grace Hopper image.
-        The first inference includes model initialization and will
-        normally be slower.
-      </p>
-
-      <button id="run-test" type="button">
-        Run Coral Test
-      </button>
+    <section class="output-box">
+      <div class="label">Output</div>
 
       <p id="message">Waiting to begin.</p>
 
-      <div id="results" class="results"></div>
-      <pre id="timings" hidden></pre>
+      <div id="results"></div>
+
+      <div id="timings" hidden></div>
     </section>
   </main>
 
@@ -213,7 +178,7 @@
     button.addEventListener("click", async () => {
       button.disabled = true;
       message.className = "";
-      message.textContent = "Loading model and running inference…";
+      message.textContent = "Running inference...";
       results.replaceChildren();
       timings.hidden = true;
 
@@ -229,7 +194,7 @@
         coralStatus.className = "value ready";
 
         message.textContent =
-          `Detected ${data.detections.length} object(s) in ${data.image}.`;
+          `Detected ${data.detections.length} object(s).`;
 
         for (const detection of data.detections) {
           const row = document.createElement("div");
@@ -248,7 +213,8 @@
         }
 
         timings.textContent =
-          `Inference times: ${data.inference_times_ms.join(" ms, ")} ms`;
+          `Inference: ${data.inference_times_ms.join(", ")} ms`;
+
         timings.hidden = false;
       } catch (error) {
         coralStatus.textContent = "Test failed";
@@ -262,4 +228,5 @@
     });
   </script>
 </body>
+
 </html>
