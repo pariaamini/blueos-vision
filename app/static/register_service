@@ -2,8 +2,7 @@
     "name":"ArduCamera",
     "description":"Arducam + Coral Vision Processing",
     "icon":"mdi-clock",
-    "company":"Technika",
+    "company":"Technika Engineering Ltd.",
     "version":"0.0.1",
-    "webpage":"https://example.com",
-    "api":""
+    "webpage":"https://github.com/pariaamini/blueos-vision/"
 }
