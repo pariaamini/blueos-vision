@@ -338,6 +338,42 @@
         mavlinkButton.disabled = false;
       }
     });
+
+    const attitudeUrl =
+      mavlink2restUrl +
+      "/mavlink/vehicles/1/components/1/messages/ATTITUDE";
+
+    async function updateAttitude() {
+      try {
+        const response = await fetch(attitudeUrl);
+
+        if (!response.ok) {
+          throw new Error(`HTTP ${response.status}`);
+        }
+
+        const data = await response.json();
+        const attitude = data.message;
+        const lastUpdated = data.status.time.last_update;
+
+        document.getElementById("roll").textContent =
+          (attitude.roll * 180 / Math.PI).toFixed(1);
+
+        document.getElementById("pitch").textContent =
+          (attitude.pitch * 180 / Math.PI).toFixed(1);
+
+        document.getElementById("yaw").textContent =
+          (attitude.yaw * 180 / Math.PI).toFixed(1);
+
+        document.getElementById("last").textContent =
+          ((Date.now() - Date.parse(lastUpdated)) / 1000).toFixed(1);
+
+      } catch (error) {
+        console.error("Could not read ATTITUDE:", error);
+      }
+    }
+
+    updateAttitude();
+    setInterval(updateAttitude, 1000);
   </script>
 
   <h3>Rover attitude</h3>
