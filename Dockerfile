@@ -2,20 +2,20 @@ FROM debian:bullseye-slim
 
 RUN apt-get update && \
     apt-get install -y --no-install-recommends \
-        build-essential \
-        ca-certificates \
-        curl \
-        gnupg \
-        python3 \
-        python3-pip && \
+    build-essential \
+    ca-certificates \
+    curl \
+    gnupg \
+    python3 \
+    python3-pip && \
     curl https://packages.cloud.google.com/apt/doc/apt-key.gpg \
-        | gpg --dearmor -o /usr/share/keyrings/coral-edgetpu.gpg && \
+    | gpg --dearmor -o /usr/share/keyrings/coral-edgetpu.gpg && \
     echo "deb [signed-by=/usr/share/keyrings/coral-edgetpu.gpg] https://packages.cloud.google.com/apt coral-edgetpu-stable main" \
-        > /etc/apt/sources.list.d/coral-edgetpu.list && \
+    > /etc/apt/sources.list.d/coral-edgetpu.list && \
     apt-get update && \
     apt-get install -y --no-install-recommends \
-        libedgetpu1-std \
-        python3-pycoral && \
+    libedgetpu1-std \
+    python3-pycoral && \
     rm -rf /var/lib/apt/lists/*
 
 COPY app /app
@@ -31,47 +31,50 @@ LABEL version="0.0.4"
 ARG IMAGE_NAME
 
 LABEL permissions='\
-{\
-  "ExposedPorts": {\
-    "80/tcp": {}\
-  },\
-  "HostConfig": {\
+    {\
+    "ExposedPorts": {\
+    "8000/tcp": {}\
+    },\
+    "HostConfig": {\
     "Privileged": true,\
-    "Binds":["/usr/blueos/extensions/$IMAGE_NAME:/app"],\
+    "Binds": [\
+    "/usr/blueos/extensions/$IMAGE_NAME:/app",\
+    "/dev/bus/usb:/dev/bus/usb"\
+    ],\
     "ExtraHosts": ["host.docker.internal:host-gateway"],\
     "PortBindings": {\
-      "8000/tcp": [\
-        {\
-          "HostPort": ""\
-        }\
-      ]\
+    "8000/tcp": [\
+    {\
+    "HostPort": ""\
     }\
-  }\
-}'
+    ]\
+    }\
+    }\
+    }'
 
 ARG AUTHOR
 ARG AUTHOR_EMAIL
 LABEL authors='[\
     {\
-        "name": "$AUTHOR",\
-        "email": "$AUTHOR_EMAIL"\
+    "name": "$AUTHOR",\
+    "email": "$AUTHOR_EMAIL"\
     }\
-]'
+    ]'
 
 ARG MAINTAINER
 ARG MAINTAINER_EMAIL
 LABEL company='{\
-        "about": "",\
-        "name": "$MAINTAINER",\
-        "email": "$MAINTAINER_EMAIL"\
+    "about": "",\
+    "name": "$MAINTAINER",\
+    "email": "$MAINTAINER_EMAIL"\
     }'
 LABEL type="example"
 ARG REPO
 ARG OWNER
 LABEL readme='https://raw.githubusercontent.com/$OWNER/$REPO/{tag}/README.md'
 LABEL links='{\
-        "source": "https://github.com/$OWNER/$REPO"\
+    "source": "https://github.com/$OWNER/$REPO"\
     }'
 LABEL requirements="core >= 1.1"
 
-ENTRYPOINT ["python3", "-m", "uvicorn", "main:app", "--app-dir", "/app", "--host", "0.0.0.0", "--port", "80"]
+ENTRYPOINT ["python3", "-m", "uvicorn", "main:app", "--app-dir", "/app", "--host", "0.0.0.0", "--port", "8000"]
