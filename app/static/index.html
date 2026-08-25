@@ -158,6 +158,9 @@
 
     <button id="run-test" type="button">Run Test</button>
 
+    <button id="test-mavlink" type="button">Test Navigator Connection</button>
+    <p id="mavlink-result">Navigator not tested.</p>
+
     <section class="output-box">
       <div class="label">Output</div>
 
@@ -243,6 +246,98 @@
       document.getElementById("yaw").innerText = (payload["yaw"] / Math.PI * 180).toFixed(1)
       document.getElementById("last").innerText = ((Date.now() - Date.parse(last_updated)) / 1000).toFixed(1)
     }, 1000)
+
+    const mavlink2restUrl =
+      `http://${document.location.hostname}/mavlink2rest`; 
+
+    const mavlinkButton =
+      document.getElementById("test-mavlink"); 
+
+    const mavlinkResult =
+      document.getElementById("mavlink-result");
+
+    mavlinkButton.addEventListener("click", async () => {
+      mavlinkButton.disabled = true;
+      mavlinkResult.textContent = "Requesting data from Navigator...";
+
+      try {
+        // Ask MAVLink2REST for a correctly structured COMMAND_LONG message.
+        const templateResponse = await fetch(
+          `${mavlink2restUrl}/helper/mavlink?name=COMMAND_LONG`
+        );
+
+        if (!templateResponse.ok) {
+          throw new Error(
+            `Could not get message template: HTTP ${templateResponse.status}`
+          );
+        }
+
+        const command = await templateResponse.json();
+
+        // Address the command to ArduRover on the Navigator.
+        command.message.target_system = 1;
+        command.message.target_component = 1;
+
+        // MAV_CMD_REQUEST_MESSAGE asks the flight controller to send
+        // one specific message back.
+        command.message.command = {
+          type: "MAV_CMD_REQUEST_MESSAGE"
+        };
+
+        // Message ID 148 is AUTOPILOT_VERSION.
+        command.message.param1 = 148;
+        command.message.param2 = 0;
+        command.message.param3 = 0;
+        command.message.param4 = 0;
+        command.message.param5 = 0;
+        command.message.param6 = 0;
+        command.message.param7 = 0;
+        command.message.confirmation = 0;
+
+        // MAVLink2REST translates this HTTP POST into a MAVLink message.
+        const sendResponse = await fetch(
+          `${mavlink2restUrl}/mavlink`,
+          {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json"
+            },
+            body: JSON.stringify(command)
+          }
+        );
+
+        if (!sendResponse.ok) {
+          throw new Error(
+            `MAVLink send failed: HTTP ${sendResponse.status}`
+          );
+        }
+
+        // Give ArduRover a moment to answer.
+        await new Promise(resolve => setTimeout(resolve, 1000));
+
+        const versionResponse = await fetch(
+          `${mavlink2restUrl}/mavlink/vehicles/1/components/1/messages/AUTOPILOT_VERSION`
+        );
+
+        if (!versionResponse.ok) {
+          throw new Error(
+            `No AUTOPILOT_VERSION response: HTTP ${versionResponse.status}`
+          );
+        }
+
+        const versionData = await versionResponse.json();
+
+        mavlinkResult.textContent =
+          `Navigator replied: ${JSON.stringify(versionData.message)}`;
+
+      } catch (error) {
+        mavlinkResult.textContent = `Test failed: ${error.message}`;
+        console.error(error);
+
+      } finally {
+        mavlinkButton.disabled = false;
+      }
+    });
   </script>
 </body>
 
