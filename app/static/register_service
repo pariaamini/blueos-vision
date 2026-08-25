@@ -1,8 +1,8 @@
 {
-    "name":"QuickStart",
-    "description":"Example Extension",
+    "name":"ArduCamera",
+    "description":"Arducam + Coral Vision Processing",
     "icon":"mdi-clock",
-    "company":"Blue Robotics",
+    "company":"Technika",
     "version":"0.0.1",
     "webpage":"https://example.com",
     "api":""
