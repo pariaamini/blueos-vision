@@ -73,7 +73,7 @@ class CoralController(Controller):
                 image.size,
                 lambda size: image.resize(
                     size,
-                    Image.Resampling.LANCZOS,
+                    Image.LANCZOS,
                 ),
             )
 
