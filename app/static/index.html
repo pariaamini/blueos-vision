@@ -1,6 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
- 
+
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -170,7 +170,7 @@
 
       <div id="timings" hidden></div>
     </section>
-    <section id="operator-prompt" hidden> 
+    <section id="operator-prompt" hidden>
       <h3>Operator action required</h3>
 
       <p id="operator-warning"></p>
@@ -213,6 +213,7 @@
     const timings = document.getElementById("timings");
     const coralStatus = document.getElementById("coral-status");
 
+    let rollTestTriggered = false;
 
     const operatorPrompt =
       document.getElementById("operator-prompt");
@@ -288,15 +289,16 @@
             detection.label === data.decision.object_label
         );
 
-        if (data.decision.behavior === "avoid") {
-          operatorPrompt.hidden = false;
+        function handleDecision(decision) {
+          if (decision.behavior === "avoid") {
+            operatorPrompt.hidden = false;
 
-          operatorWarning.textContent =
-            `${data.decision.reason}. ` +
-            "The rover is waiting for operator input.";
+            operatorWarning.textContent =
+              `${decision.reason}. ` +
+              "The rover is waiting for operator input.";
 
-          operatorStatus.textContent =
-            "Rover paused.";
+            operatorStatus.textContent = "Rover paused.";
+          }
         }
 
         if (decidingDetection) {
@@ -442,17 +444,30 @@
         const attitude = data.message;
         const lastUpdated = data.status.time.last_update;
 
-        document.getElementById("roll").textContent =
-          (attitude.roll * 180 / Math.PI).toFixed(1);
+        const rollDeg = attitude.roll * 180 / Math.PI;
+        const pitchDeg = attitude.pitch * 180 / Math.PI;
+        const yawDeg = attitude.yaw * 180 / Math.PI;
 
-        document.getElementById("pitch").textContent =
-          (attitude.pitch * 180 / Math.PI).toFixed(1);
+        document.getElementById("roll").textContent = rollDeg.toFixed(1);
+        document.getElementById("pitch").textContent = pitchDeg.toFixed(1);
+        document.getElementById("yaw").textContent = yawDeg.toFixed(1);
 
-        document.getElementById("yaw").textContent =
-          (attitude.yaw * 180 / Math.PI).toFixed(1);
+        if (Math.abs(rollDeg) > 40 && !rollTestTriggered) {
+          rollTestTriggered = true;
 
-        document.getElementById("last").textContent =
-          ((Date.now() - Date.parse(lastUpdated)) / 1000).toFixed(1);
+          const decision = {
+            behavior: "avoid",
+            reason: `TEST: Roll exceeded 40° (${rollDeg.toFixed(1)}°)`,
+            object_label: null
+          };
+
+          handleDecision(decision);
+        }
+
+        // Reset once we've leveled the board again
+        if (Math.abs(rollDeg) < 35) {
+          rollTestTriggered = false;
+        }
 
       } catch (error) {
         console.error("Could not read ATTITUDE:", error);
