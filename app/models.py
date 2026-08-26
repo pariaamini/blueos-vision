@@ -10,6 +10,10 @@ class Behavior(Enum):
     AVOID = "avoid"
     CONTINUE = "continue"
 
+class OperatorChoice(Enum):
+    CONTINUE_MISSION = "continue_mission"
+    TAKE_MANUAL_CONTROL = "take_manual_control"
+    RESUME_NEXT_WAYPOINT = "resume_next_waypoint"
 
 @dataclass(frozen=True)
 class Detection:
@@ -23,3 +27,4 @@ class Decision:
     behavior: Behavior
     reason: str
     object_label: Optional[str] = None
+

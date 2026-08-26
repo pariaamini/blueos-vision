@@ -10,6 +10,8 @@ from constants import (
 from models import Behavior, Decision, Detection
 
 
+# different behaviours based on what is detected
+# current goal: if obstacle/ANYTHING unusual -> notify operator, wait for further instruction
 def choose_behavior(detections: List[Detection]) -> Decision:
     obstacles = [
         detection

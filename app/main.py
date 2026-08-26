@@ -14,7 +14,7 @@ from litestar.static_files.config import StaticFilesConfig
 from decision import choose_behavior
 from models import Detection
 
-
+# start backend (idrk)
 class CountController(Controller):
     COUNT_VAR = "quickstart_backend_perm_count"
 
@@ -50,6 +50,7 @@ class CountController(Controller):
         return output
 
 
+# setup code for the coral
 class CoralController(Controller):
     MODEL_PATH = Path(
         "/app/test_data/" "ssd_mobilenet_v2_coco_quant_postprocess_edgetpu.tflite"
@@ -81,8 +82,8 @@ class CoralController(Controller):
 
             inference_times_ms = []
 
-            # Run several times so we can see the slower first inference
-            # separately from subsequent Coral inference times.
+            # run several times so we can see the slower first inference
+            # separately from subsequent coral inference times    --> FOR TESTING!!
             for _ in range(5):
                 start = time.perf_counter()
                 interpreter.invoke()
