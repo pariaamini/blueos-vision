@@ -212,23 +212,29 @@
         coralStatus.textContent = "Connected";
         coralStatus.className = "value ready";
 
-        message.textContent =
-          `Detected ${data.detections.length} object(s).`;
+        const decidingDetection = data.detections.find(
+          detection =>
+            detection.label === data.decision.object_label
+        );
 
-        for (const detection of data.detections) {
-          const row = document.createElement("div");
-          row.className = "detection";
+        if (decidingDetection) {
+          message.textContent =
+            `${decidingDetection.label} detected — ` +
+            `${(decidingDetection.confidence * 100).toFixed(1)}% confidence`;
 
-          const label = document.createElement("span");
-          label.textContent = detection.label;
+          const behaviorLine = document.createElement("p");
+          behaviorLine.textContent =
+            `Resulting rover behaviour: ${data.decision.behavior.toUpperCase()}`;
 
-          const confidence = document.createElement("span");
-          confidence.className = "confidence";
-          confidence.textContent =
-            `${(detection.confidence * 100).toFixed(1)}%`;
+          results.append(behaviorLine);
+        } else {
+          message.textContent = "No relevant object detected.";
 
-          row.append(label, confidence);
-          results.append(row);
+          const behaviorLine = document.createElement("p");
+          behaviorLine.textContent =
+            `Resulting rover behaviour: ${data.decision.behavior.toUpperCase()}`;
+
+          results.append(behaviorLine);
         }
 
         timings.textContent =

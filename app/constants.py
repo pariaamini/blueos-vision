@@ -1,14 +1,9 @@
-# update when model is chosen
+TARGET_LABELS = set()
 
-class Constants():
+OBSTACLE_LABELS = {
+    "person",
+}
 
-    TARGET_LABELS = {
-        "", 
-    }
-
-    OBSTACLE_LABELS = {
-        "",
-    }
-
-    MINIMUM_TARGET_CONFIDENCE = 0.0
-    MINIMUM_OBSTACLE_CONFIDENCE = 0.0
+MINIMUM_TARGET_CONFIDENCE = 0.70
+MINIMUM_OBSTACLE_CONFIDENCE = 0.70
+    

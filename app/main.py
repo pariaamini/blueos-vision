@@ -11,6 +11,9 @@ from litestar.datastructures import State
 from litestar.logging import LoggingConfig
 from litestar.static_files.config import StaticFilesConfig
 
+from decision import choose_behavior
+from models import Detection
+
 
 class CountController(Controller):
     COUNT_VAR = "quickstart_backend_perm_count"
@@ -47,10 +50,9 @@ class CountController(Controller):
         return output
 
 
-class CoralController(Controller): 
+class CoralController(Controller):
     MODEL_PATH = Path(
-        "/app/test_data/"
-        "ssd_mobilenet_v2_coco_quant_postprocess_edgetpu.tflite"
+        "/app/test_data/" "ssd_mobilenet_v2_coco_quant_postprocess_edgetpu.tflite"
     )
     LABELS_PATH = Path("/app/test_data/coco_labels.txt")
     IMAGE_PATH = Path("/app/test_data/grace_hopper.bmp")
@@ -109,6 +111,17 @@ class CoralController(Controller):
                 for obj in objects
             ]
 
+            decision_inputs = [ 
+                Detection(
+                    label=detection["label"],
+                    confidence=detection["confidence"],
+                    bounding_box=tuple(detection["bounding_box"]),
+                )
+                for detection in detections
+            ]
+
+            decision = choose_behavior(decision_inputs) # feed detections to decision
+
             return {
                 "success": True,
                 "coral_connected": True,
@@ -116,6 +129,11 @@ class CoralController(Controller):
                 "image": self.IMAGE_PATH.name,
                 "inference_times_ms": inference_times_ms,
                 "detections": detections,
+                "decision": { # return the behaviour, reason, and object label
+                    "behavior": decision.behavior.value,
+                    "reason": decision.reason,
+                    "object_label": decision.object_label,
+                },
             }
 
         except Exception as error:
