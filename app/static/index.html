@@ -170,6 +170,25 @@
 
       <div id="timings" hidden></div>
     </section>
+    <section id="operator-prompt" hidden> 
+      <h3>Operator action required</h3>
+
+      <p id="operator-warning"></p>
+
+      <button id="continue-mission" type="button">
+        Continue Mission
+      </button>
+
+      <button id="manual-control" type="button">
+        Take Manual Control
+      </button>
+
+      <button id="resume-mission" type="button" hidden>
+        Resume at Next Waypoint
+      </button>
+
+      <p id="operator-status"></p>
+    </section>
 
     <h3>Rover attitude</h3>
 
@@ -194,12 +213,64 @@
     const timings = document.getElementById("timings");
     const coralStatus = document.getElementById("coral-status");
 
+
+    const operatorPrompt =
+      document.getElementById("operator-prompt");
+
+    const operatorWarning =
+      document.getElementById("operator-warning");
+
+    const continueMissionButton =
+      document.getElementById("continue-mission");
+
+    const manualControlButton =
+      document.getElementById("manual-control");
+
+    const resumeMissionButton =
+      document.getElementById("resume-mission");
+
+    const operatorStatus =
+      document.getElementById("operator-status");
+
+
+    continueMissionButton.addEventListener("click", () => {
+      operatorStatus.textContent =
+        "Operator selected: continue mission.";
+
+      continueMissionButton.hidden = true;
+      manualControlButton.hidden = true;
+    });
+    manualControlButton.addEventListener("click", () => {
+      operatorStatus.textContent =
+        "Operator selected: manual control.";
+
+      continueMissionButton.hidden = true;
+      manualControlButton.hidden = true;
+      resumeMissionButton.hidden = false;
+    });
+
+    resumeMissionButton.addEventListener("click", () => {
+      operatorStatus.textContent =
+        "Operator selected: resume at next waypoint.";
+
+      continueMissionButton.hidden = true;
+      manualControlButton.hidden = true;
+      resumeMissionButton.hidden = true;
+    });
     button.addEventListener("click", async () => {
       button.disabled = true;
       message.className = "";
       message.textContent = "Running inference...";
       results.replaceChildren();
       timings.hidden = true;
+
+      operatorPrompt.hidden = true;
+      operatorWarning.textContent = "";
+      operatorStatus.textContent = "";
+
+      continueMissionButton.hidden = false;
+      manualControlButton.hidden = false;
+      resumeMissionButton.hidden = true;
 
       try {
         const response = await fetch("/test_coral");
@@ -216,6 +287,17 @@
           detection =>
             detection.label === data.decision.object_label
         );
+
+        if (data.decision.behavior === "avoid") {
+          operatorPrompt.hidden = false;
+
+          operatorWarning.textContent =
+            `${data.decision.reason}. ` +
+            "The rover is waiting for operator input.";
+
+          operatorStatus.textContent =
+            "Rover paused.";
+        }
 
         if (decidingDetection) {
           message.textContent =
